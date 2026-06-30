@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d1" for="edge" attr.name="weight" attr.type="double" />
+  <key id="d0" for="node" attr.name="species" attr.type="string" />
+  <graph edgedefault="undirected">
+    <node id="salmonella.fna_cds_0">
+      <data key="d0">salmonella.fna</data>
+    </node>
+    <node id="acinetobacter.fna_cds_0">
+      <data key="d0">acinetobacter.fna</data>
+    </node>
+    <node id="pseudomonas.fna_cds_0">
+      <data key="d0">pseudomonas.fna</data>
+    </node>
+    <node id="salmonella.fna_cds_1">
+      <data key="d0">salmonella.fna</data>
+    </node>
+    <node id="ecoli.fna_cds_0">
+      <data key="d0">ecoli.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_2">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_0">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_4">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_6">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_1">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_3">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <node id="klebsiella.fna_cds_5">
+      <data key="d0">klebsiella.fna</data>
+    </node>
+    <edge source="salmonella.fna_cds_0" target="acinetobacter.fna_cds_0">
+      <data key="d1">0.6530138431871665</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="pseudomonas.fna_cds_0">
+      <data key="d1">0.6875505707763067</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="salmonella.fna_cds_1">
+      <data key="d1">0.7352237021794543</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="ecoli.fna_cds_0">
+      <data key="d1">0.9635873587635683</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_2">
+      <data key="d1">0.7598286010808958</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_0">
+      <data key="d1">0.9207241216697379</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_4">
+      <data key="d1">0.24519584953095835</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_1">
+      <data key="d1">0.7461047624328979</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_3">
+      <data key="d1">0.706048096681856</data>
+    </edge>
+    <edge source="salmonella.fna_cds_0" target="klebsiella.fna_cds_5">
+      <data key="d1">0.208365407439982</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="pseudomonas.fna_cds_0">
+      <data key="d1">0.2359644604454975</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="salmonella.fna_cds_1">
+      <data key="d1">0.5128856337780279</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="ecoli.fna_cds_0">
+      <data key="d1">0.710506751241515</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="klebsiella.fna_cds_2">
+      <data key="d1">0.545849294430201</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="klebsiella.fna_cds_0">
+      <data key="d1">0.4831385722729043</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="klebsiella.fna_cds_1">
+      <data key="d1">0.6372092816988211</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="klebsiella.fna_cds_3">
+      <data key="d1">0.557959718848367</data>
+    </edge>
+    <edge source="acinetobacter.fna_cds_0" target="klebsiella.fna_cds_5">
+      <data key="d1">0.24687904979972733</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="salmonella.fna_cds_1">
+      <data key="d1">0.5258915975248056</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="ecoli.fna_cds_0">
+      <data key="d1">0.6162047928503525</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="klebsiella.fna_cds_2">
+      <data key="d1">0.5862428183642122</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="klebsiella.fna_cds_0">
+      <data key="d1">0.8451387630301559</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="klebsiella.fna_cds_1">
+      <data key="d1">0.49023704338421903</data>
+    </edge>
+    <edge source="pseudomonas.fna_cds_0" target="klebsiella.fna_cds_3">
+      <data key="d1">0.5283386989216219</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="ecoli.fna_cds_0">
+      <data key="d1">0.7394244230477144</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="klebsiella.fna_cds_2">
+      <data key="d1">0.6570467141744766</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="klebsiella.fna_cds_0">
+      <data key="d1">0.7092504272039828</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="klebsiella.fna_cds_4">
+      <data key="d1">0.22220668559008708</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="klebsiella.fna_cds_1">
+      <data key="d1">0.5922793708817098</data>
+    </edge>
+    <edge source="salmonella.fna_cds_1" target="klebsiella.fna_cds_3">
+      <data key="d1">0.5897721719306552</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_2">
+      <data key="d1">0.7595114154044319</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_0">
+      <data key="d1">0.8713397433499476</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_4">
+      <data key="d1">0.2559520239992477</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_1">
+      <data key="d1">0.7700672268212961</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_3">
+      <data key="d1">0.7269011812779783</data>
+    </edge>
+    <edge source="ecoli.fna_cds_0" target="klebsiella.fna_cds_5">
+      <data key="d1">0.218099786689103</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_2" target="klebsiella.fna_cds_0">
+      <data key="d1">0.7411121303185891</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_2" target="klebsiella.fna_cds_4">
+      <data key="d1">0.21547125591468472</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_2" target="klebsiella.fna_cds_1">
+      <data key="d1">0.6574831586392194</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_2" target="klebsiella.fna_cds_3">
+      <data key="d1">0.6317645578619767</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_0" target="klebsiella.fna_cds_4">
+      <data key="d1">0.21494948355446156</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_0" target="klebsiella.fna_cds_1">
+      <data key="d1">0.6800616027757835</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_0" target="klebsiella.fna_cds_3">
+      <data key="d1">0.6689155381979536</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_4" target="klebsiella.fna_cds_1">
+      <data key="d1">0.20591592558698735</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_4" target="klebsiella.fna_cds_3">
+      <data key="d1">0.21168091547762946</data>
+    </edge>
+    <edge source="klebsiella.fna_cds_1" target="klebsiella.fna_cds_3">
+      <data key="d1">0.6224789532373222</data>
+    </edge>
+  </graph>
+</graphml>
