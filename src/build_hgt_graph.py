@@ -5,7 +5,20 @@ import networkx as nx
 import math
 import matplotlib.pyplot as plt
 
+# ----------------------------
+# CONFIG
+# ----------------------------
+
 GENE_DIR = Path("data/genes_cds")
+OUTPUT_GRAPH = "data/processed/hgt_graph.graphml"
+OUTPUT_FIG = "data/processed/hgt_graph_publication.png"
+
+# ----------------------------
+# HELPERS
+# ----------------------------
+
+def get_species(gene_id):
+    return gene_id.split("_")[0]
 
 
 # ----------------------------
@@ -14,7 +27,11 @@ GENE_DIR = Path("data/genes_cds")
 
 def kmer_counts(seq, k=8):
     kmers = [seq[i:i+k] for i in range(len(seq)-k+1)]
-    return Counter(kmers)
+    c = Counter(kmers)
+    total = sum(c.values())
+
+    # normalize (important for cosine stability)
+    return {k: v / total for k, v in c.items()}
 
 
 def cosine_similarity(c1, c2):
@@ -22,8 +39,8 @@ def cosine_similarity(c1, c2):
 
     dot = sum(c1[k] * c2[k] for k in intersection)
 
-    norm1 = math.sqrt(sum(v*v for v in c1.values()))
-    norm2 = math.sqrt(sum(v*v for v in c2.values()))
+    norm1 = math.sqrt(sum(v * v for v in c1.values()))
+    norm2 = math.sqrt(sum(v * v for v in c2.values()))
 
     if norm1 == 0 or norm2 == 0:
         return 0
@@ -42,37 +59,42 @@ def load_genes():
         record = list(SeqIO.parse(file, "fasta"))[0]
         seq = str(record.seq).upper()
 
-        genes[file.stem] = {
+        gene_id = file.stem
+
+        genes[gene_id] = {
             "seq": seq,
             "kmers": kmer_counts(seq, k=8),
-            "species": file.stem.split("_")[0]
+            "species": get_species(gene_id)
         }
 
     return genes
 
 
 # ----------------------------
-# BUILD GRAPH + HGT SCORE
+# MAIN PIPELINE
 # ----------------------------
 
 def main():
 
-    print("\n=== Phase 8: HGT Graph + Scoring + Visualisation ===\n")
+    print("\n=== Phase: HGT Graph + Publication Analysis ===\n")
 
     genes = load_genes()
 
     G = nx.Graph()
 
-    # species tracking for ubiquity penalty
+    # track gene family presence across species
     gene_species_map = defaultdict(set)
 
-    for g in genes:
-        G.add_node(g, species=genes[g]["species"])
-        gene_species_map[g.split("_cds_")[0]].add(genes[g]["species"])
-
-    edges_added = 0
+    # add nodes
+    for g, data in genes.items():
+        G.add_node(g, species=data["species"])
+        gene_species_map[g.split("_cds_")[0]].add(data["species"])
 
     gene_list = list(genes.keys())
+
+    # ----------------------------
+    # BUILD GRAPH
+    # ----------------------------
 
     for i in range(len(gene_list)):
         for j in range(i + 1, len(gene_list)):
@@ -85,11 +107,8 @@ def main():
                 genes[g2]["kmers"]
             )
 
-            # remove noise
             if sim > 0.2:
-
                 G.add_edge(g1, g2, weight=sim)
-                edges_added += 1
 
     print("Nodes:", G.number_of_nodes())
     print("Edges:", G.number_of_edges())
@@ -104,9 +123,12 @@ def main():
 
         if genes[u]["species"] != genes[v]["species"]:
 
+            u_family = u.split("_cds_")[0]
+            v_family = v.split("_cds_")[0]
+
             ubiquity_penalty = 1 / (
-                len(gene_species_map[u.split("_cds_")[0]]) +
-                len(gene_species_map[v.split("_cds_")[0]])
+                len(gene_species_map[u_family]) +
+                len(gene_species_map[v_family])
             )
 
             hgt_score = data["weight"] * ubiquity_penalty
@@ -116,21 +138,19 @@ def main():
     hgt_edges.sort(key=lambda x: x[2], reverse=True)
 
     print("\n=== Top HGT Candidates ===\n")
-
     for e in hgt_edges[:15]:
         print(e)
 
     # ----------------------------
-    # VISUALISATION
+    # VISUALISATION (PUBLICATION STYLE)
     # ----------------------------
 
-    print("\nGenerating graph plot...")
+    print("\nGenerating publication-quality figure...")
 
-    plt.figure(figsize=(10, 7))
+    plt.figure(figsize=(14, 10), dpi=300)
 
-    pos = nx.spring_layout(G, seed=42)
+    pos = nx.spring_layout(G, seed=42, k=0.8)
 
-    # node colors by species
     species_list = list(set(nx.get_node_attributes(G, "species").values()))
     color_map = {s: i for i, s in enumerate(species_list)}
 
@@ -138,26 +158,56 @@ def main():
         color_map[G.nodes[n]["species"]] for n in G.nodes()
     ]
 
-    nx.draw(
+    # edges
+    nx.draw_networkx_edges(
         G,
         pos,
-        with_labels=True,
-        node_color=node_colors,
-        cmap=plt.cm.Set2,
-        node_size=800,
-        font_size=8
+        alpha=0.25,
+        width=0.8
     )
 
-    plt.title("HGT Gene Similarity Network")
+    # nodes
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        node_color=node_colors,
+        cmap=plt.cm.Set2,
+        node_size=900,
+        edgecolors="black",
+        linewidths=0.5
+    )
+
+    # labels (FIXED)
+    labels = {n: n for n in G.nodes()}
+
+    nx.draw_networkx_labels(
+        G,
+        pos,
+        labels=labels,
+        font_size=7,
+        font_color="black",
+        bbox=dict(
+            facecolor="white",
+            edgecolor="none",
+            alpha=0.7,
+            boxstyle="round,pad=0.2"
+        )
+    )
+
+    plt.title("HGT Gene Similarity Network", fontsize=14)
+    plt.axis("off")
+    plt.tight_layout()
+
+    plt.savefig(OUTPUT_FIG, dpi=300, bbox_inches="tight")
     plt.show()
 
     # ----------------------------
-    # EXPORT FOR BIOINFO TOOLS
+    # EXPORT GRAPH
     # ----------------------------
 
-    nx.write_graphml(G, "data/processed/hgt_graph.graphml")
-
-    print("\nSaved graph to: data/processed/hgt_graph.graphml")
+    nx.write_graphml(G, OUTPUT_GRAPH)
+    print(f"\nSaved graph to: {OUTPUT_GRAPH}")
+    print(f"Saved figure to: {OUTPUT_FIG}")
 
 
 if __name__ == "__main__":
