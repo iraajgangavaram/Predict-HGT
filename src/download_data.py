@@ -1,6 +1,6 @@
 import os
 import requests
-from tqdm import tqdm
+import tqdm as tqdm_ # type: ignore
 from pathlib import Path
 
 # ----------------------------
@@ -31,7 +31,7 @@ def download_file(url, output_path):
     response = requests.get(url, stream=True)
     total_size = int(response.headers.get('content-length', 0))
 
-    with open(output_path, "wb") as file, tqdm(
+    with open(output_path, "wb") as file, tqdm_.tqdm(
         desc=output_path.name,
         total=total_size,
         unit='B',
