@@ -1,3 +1,6 @@
+from cProfile import label
+from pyexpat import features
+
 from Bio import SeqIO
 import gzip
 import pandas as pd
@@ -45,14 +48,27 @@ def compute_gc(seq):
 # ----------------------------
 
 def process_genome(file_path, label):
-    records = list(SeqIO.parse(gzip.open(file_path, "rt"), "fasta"))
-    seq = str(records[0].seq).upper()
+    try:
+        handle = gzip.open(file_path, "rt")
+        records = list(SeqIO.parse(handle, "fasta"))
 
-    features = compute_kmer_freq(seq, K)
-    features["gc_content"] = compute_gc(seq)
-    features["label"] = label
+        print(f"{label}: sequences found =", len(records))
 
-    return features
+        if len(records) == 0:
+            print(f"[SKIP] {label} - no sequences")
+            return None
+
+        seq = str(records[0].seq).upper()
+
+        features = compute_kmer_freq(seq, K)
+        features["gc_content"] = compute_gc(seq)
+        features["label"] = label
+
+        return features
+
+    except Exception as e:
+        print(f"[ERROR] {label}: {e}")
+        return None
 
 
 def main():
@@ -62,13 +78,19 @@ def main():
     print("\n=== Building Multi-Genome Dataset ===\n")
 
     for file in GENOMES_DIR.glob("*.fna.gz"):
+        print("FOUND FILE:", file)
 
         label = file.stem  # genome name
 
         print(f"Processing {label}")
 
+        print("PROCESSING:", label)
         features = process_genome(file, label)
-        dataset.append(features)
+        if features is None:
+            print("FAILED:", label)
+        else:
+            dataset.append(features)
+        print("ADDED:", label)
 
     df = pd.DataFrame(dataset)
 
