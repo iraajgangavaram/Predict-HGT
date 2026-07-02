@@ -143,6 +143,7 @@ Predict-HGT/
 │       ├── hgt_dataset.csv
 │       ├── hgt_graph.graphml
 │       └── other generated outputs
+        data/processed/hgt_graph_publication.pdf
 │
 ├── src/
 │   ├── download_data.py             # Download bacterial genomes
@@ -211,7 +212,7 @@ Genes (nodes)	12
 Similarity edges	46
 Network communities detected	3
 
-The graph-based HGT scoring system produced a ranked list of candidate cross-species similarities. The highest scoring relationships were observed between genes from Acinetobacter, Escherichia, Salmonella and Pseudomonas, indicating regions of high sequence conservation across species.
+The graph-based HGT scoring system produced a ranked list of candidate cross-species similarities. The highest scoring relationships were observed between genes from Acinetobacter, Escherichia, Salmonella and Pseudomonas, indicating regions of high sequence conservation across species. The graph can be found in data/processed/hgt_graph_publication.pdf.
 
 Community detection identified three distinct gene clusters, including one mixed-species community that may represent conserved evolutionary relationships worthy of further investigation.
 
