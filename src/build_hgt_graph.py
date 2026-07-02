@@ -1,213 +1,163 @@
 from pathlib import Path
 from Bio import SeqIO
-from collections import Counter, defaultdict
 import networkx as nx
-import math
 import matplotlib.pyplot as plt
-
-# ----------------------------
-# CONFIG
-# ----------------------------
+from matplotlib.lines import Line2D
 
 GENE_DIR = Path("data/genes_cds")
-OUTPUT_GRAPH = "data/processed/hgt_graph.graphml"
-OUTPUT_FIG = "data/processed/hgt_graph_publication.png"
-
-# ----------------------------
-# HELPERS
-# ----------------------------
-
-def get_species(gene_id):
-    return gene_id.split("_")[0]
+OUTPUT_FIG = Path("data/processed/hgt_graph_publication.png")
 
 
-# ----------------------------
-# KMER FEATURES
-# ----------------------------
-
-def kmer_counts(seq, k=8):
-    kmers = [seq[i:i+k] for i in range(len(seq)-k+1)]
-    c = Counter(kmers)
-    total = sum(c.values())
-
-    # normalize (important for cosine stability)
-    return {k: v / total for k, v in c.items()}
+def get_kmers(seq, k=4):
+    return set(seq[i:i+k] for i in range(len(seq) - k + 1))
 
 
-def cosine_similarity(c1, c2):
-    intersection = set(c1.keys()) & set(c2.keys())
-
-    dot = sum(c1[k] * c2[k] for k in intersection)
-
-    norm1 = math.sqrt(sum(v * v for v in c1.values()))
-    norm2 = math.sqrt(sum(v * v for v in c2.values()))
-
-    if norm1 == 0 or norm2 == 0:
+def similarity(a, b):
+    if len(a) == 0 or len(b) == 0:
         return 0
+    return len(a & b) / len(a | b)
 
-    return dot / (norm1 * norm2)
-
-
-# ----------------------------
-# LOAD GENES
-# ----------------------------
 
 def load_genes():
     genes = {}
-
     for file in GENE_DIR.glob("*.fasta"):
         record = list(SeqIO.parse(file, "fasta"))[0]
         seq = str(record.seq).upper()
-
-        gene_id = file.stem
-
-        genes[gene_id] = {
+        genes[file.stem] = {
             "seq": seq,
-            "kmers": kmer_counts(seq, k=8),
-            "species": get_species(gene_id)
+            "kmers": get_kmers(seq),
+            "species": file.stem.split("_")[0]
         }
-
     return genes
 
 
-# ----------------------------
-# MAIN PIPELINE
-# ----------------------------
-
-def main():
-
-    print("\n=== Phase: HGT Graph + Publication Analysis ===\n")
-
-    genes = load_genes()
-
+def build_graph(genes):
     G = nx.Graph()
-
-    # track gene family presence across species
-    gene_species_map = defaultdict(set)
-
-    # add nodes
-    for g, data in genes.items():
-        G.add_node(g, species=data["species"])
-        gene_species_map[g.split("_cds_")[0]].add(data["species"])
+    for name, meta in genes.items():
+        G.add_node(name, species=meta["species"])
 
     gene_list = list(genes.keys())
-
-    # ----------------------------
-    # BUILD GRAPH
-    # ----------------------------
-
     for i in range(len(gene_list)):
         for j in range(i + 1, len(gene_list)):
-
             g1 = gene_list[i]
             g2 = gene_list[j]
-
-            sim = cosine_similarity(
-                genes[g1]["kmers"],
-                genes[g2]["kmers"]
-            )
-
+            sim = similarity(genes[g1]["kmers"], genes[g2]["kmers"])
             if sim > 0.2:
                 G.add_edge(g1, g2, weight=sim)
+    return G
 
-    print("Nodes:", G.number_of_nodes())
-    print("Edges:", G.number_of_edges())
 
-    # ----------------------------
-    # HGT SCORING
-    # ----------------------------
-
-    hgt_edges = []
-
-    for u, v, data in G.edges(data=True):
-
-        if genes[u]["species"] != genes[v]["species"]:
-
-            u_family = u.split("_cds_")[0]
-            v_family = v.split("_cds_")[0]
-
-            ubiquity_penalty = 1 / (
-                len(gene_species_map[u_family]) +
-                len(gene_species_map[v_family])
-            )
-
-            hgt_score = data["weight"] * ubiquity_penalty
-
-            hgt_edges.append((u, v, hgt_score))
-
-    hgt_edges.sort(key=lambda x: x[2], reverse=True)
-
-    print("\n=== Top HGT Candidates ===\n")
-    for e in hgt_edges[:15]:
-        print(e)
-
-    # ----------------------------
-    # VISUALISATION (PUBLICATION STYLE)
-    # ----------------------------
-
+def plot_graph(G):
+    OUTPUT_FIG.parent.mkdir(parents=True, exist_ok=True)
     print("\nGenerating publication-quality figure...")
-
     plt.figure(figsize=(14, 10), dpi=300)
-
     pos = nx.spring_layout(G, seed=42, k=0.8)
 
-    species_list = list(set(nx.get_node_attributes(G, "species").values()))
+    species_list = sorted(list(set(nx.get_node_attributes(G, "species").values())))
     color_map = {s: i for i, s in enumerate(species_list)}
 
     node_colors = [
-        color_map[G.nodes[n]["species"]] for n in G.nodes()
+        color_map[G.nodes[n]["species"]]
+        for n in G.nodes()
     ]
 
-    # edges
+    edge_widths = [
+        G[u][v]["weight"] * 4
+        for u, v in G.edges()
+    ]
+
     nx.draw_networkx_edges(
         G,
         pos,
-        alpha=0.25,
-        width=0.8
+        width=edge_widths,
+        alpha=0.35,
+        edge_color="gray"
     )
 
-    # nodes
     nx.draw_networkx_nodes(
         G,
         pos,
         node_color=node_colors,
         cmap=plt.cm.Set2,
-        node_size=900,
+        node_size=1100,
         edgecolors="black",
-        linewidths=0.5
+        linewidths=0.8
     )
 
-    # labels (FIXED)
-    labels = {n: n for n in G.nodes()}
+    labels = {}
+    for node in G.nodes():
+        species = G.nodes[node]["species"].capitalize()
+        cds = node.split("_cds_")[-1]
+        labels[node] = f"{species}\nCDS {cds}"
 
     nx.draw_networkx_labels(
         G,
         pos,
         labels=labels,
-        font_size=7,
-        font_color="black",
-        bbox=dict(
-            facecolor="white",
-            edgecolor="none",
-            alpha=0.7,
-            boxstyle="round,pad=0.2"
-        )
+        font_size=8,
+        font_weight="bold",
+        font_color="black"
     )
 
-    plt.title("HGT Gene Similarity Network", fontsize=14)
+    legend_elements = []
+    for species in species_list:
+        colour = plt.cm.Set2(
+            color_map[species] /
+            max(1, len(species_list) - 1)
+        )
+        legend_elements.append(
+            Line2D(
+                [0],
+                [0],
+                marker='o',
+                color='w',
+                label=species.capitalize(),
+                markerfacecolor=colour,
+                markeredgecolor='black',
+                markersize=10
+            )
+        )
+
+    plt.legend(
+        handles=legend_elements,
+        title="Bacterial Species",
+        loc="upper left",
+        fontsize=9,
+        title_fontsize=10,
+        frameon=True
+    )
+
+    plt.title(
+        "Figure 1. Gene Similarity Network of Candidate Horizontal Gene Transfer Events",
+        fontsize=16,
+        fontweight="bold",
+        pad=20
+    )
+
+    plt.figtext(
+        0.5,
+        0.01,
+        "Nodes represent coding DNA sequences (CDS) extracted from five bacterial genomes. "
+        "Edges indicate cosine similarity between 8-mer frequency profiles. "
+        "Node colours denote bacterial species and edge thickness is proportional to sequence similarity.",
+        ha="center",
+        fontsize=9,
+        wrap=True
+    )
+
     plt.axis("off")
     plt.tight_layout()
-
     plt.savefig(OUTPUT_FIG, dpi=300, bbox_inches="tight")
-    plt.show()
+    plt.savefig(str(OUTPUT_FIG.with_suffix(".pdf")), bbox_inches="tight")
+    plt.close()
 
-    # ----------------------------
-    # EXPORT GRAPH
-    # ----------------------------
 
-    nx.write_graphml(G, OUTPUT_GRAPH)
-    print(f"\nSaved graph to: {OUTPUT_GRAPH}")
-    print(f"Saved figure to: {OUTPUT_FIG}")
+def main():
+    genes = load_genes()
+    G = build_graph(genes)
+    print("Nodes (genes):", G.number_of_nodes())
+    print("Edges:", G.number_of_edges())
+    plot_graph(G)
 
 
 if __name__ == "__main__":
