@@ -258,3 +258,6 @@ Investigating Graph Neural Networks (GNNs) for learning directly from gene simil
 Developing an interactive web application for visualising HGT networks and candidate transfer events.
 
 These extensions would transform the current proof-of-concept pipeline into a more comprehensive comparative genomics framework suitable for larger-scale microbial evolutionary studies
+
+## Author
+Iraaj Gangavaram
