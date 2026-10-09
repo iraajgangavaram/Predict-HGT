@@ -1,0 +1,13 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
