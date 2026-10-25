@@ -1,10 +1,13 @@
 # Predict-HGT
 
-An exploratory look at whether k-mer composition and a similarity network can
-point to horizontal gene transfer (HGT) between five bacterial genomes. This
-was one of my first bioinformatics projects. The write-up below says plainly
-what the code does now and where it falls short, because some of the early
-design choices turned out not to measure what I intended.
+Predict-HGT is a bioinformatics pipeline that investigates potential horizontal
+gene transfer (HGT) between bacterial genomes using sequence similarity,
+machine learning and graph-based network analysis.
+
+This was one of my first bioinformatics projects. When I reviewed it in October
+2026 I found that some early design choices do not measure what I intended, so
+this README now says plainly what the code does and where it falls short (see
+[Known problems](#known-problems)).
 
 ## What it does
 
