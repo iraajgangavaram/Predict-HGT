@@ -6,6 +6,7 @@ from matplotlib.lines import Line2D
 
 GENE_DIR = Path("data/genes_cds")
 OUTPUT_FIG = Path("data/processed/hgt_graph_publication.png")
+OUTPUT_GRAPH = Path("data/processed/hgt_graph.graphml")
 
 
 def get_kmers(seq, k=4):
@@ -158,6 +159,8 @@ def main():
     print("Nodes (genes):", G.number_of_nodes())
     print("Edges:", G.number_of_edges())
     plot_graph(G)
+    nx.write_graphml(G, OUTPUT_GRAPH)
+    print(f"Saved graph to: {OUTPUT_GRAPH}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,3 @@
-from cProfile import label
-from pyexpat import features
 
 from Bio import SeqIO
 import gzip
