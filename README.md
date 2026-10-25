@@ -98,6 +98,10 @@ network figure (`hgt_graph_publication.png` and `.pdf`). The saved network has
 - Test the scoring on a set of documented transfer events before applying it
   to new genomes.
 
+## Author
+
+Iraaj Gangavaram
+
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
