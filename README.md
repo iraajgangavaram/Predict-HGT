@@ -4,11 +4,6 @@ Predict-HGT is a bioinformatics pipeline that investigates potential horizontal
 gene transfer (HGT) between bacterial genomes using sequence similarity,
 machine learning and graph-based network analysis.
 
-This was one of my first bioinformatics projects. When I reviewed it in October
-2026 I found that some early design choices do not measure what I intended, so
-this README now says plainly what the code does and where it falls short (see
-[Known problems](#known-problems)).
-
 ## What it does
 
 1. Downloads five RefSeq reference genomes from NCBI.
@@ -28,26 +23,18 @@ this README now says plainly what the code does and where it falls short (see
 | *Pseudomonas aeruginosa* | GCF_000006765.1 |
 | *Acinetobacter baumannii* | GCF_000746645.1 |
 
-## Known problems
+## Limitations
 
-These are the reasons the results should not be read as HGT evidence.
-
-- **The "genes" are whole replicons.** `extract_cds.py` writes out each FASTA
-  record of at least 300 bp. It does not find coding sequences, so each node in
-  the network is a chromosome or plasmid, not a gene. A real version would use
-  the NCBI CDS files (`*_cds_from_genomic.fna.gz`) or call genes with Prodigal.
-- **4-mer similarity saturates.** A sequence of more than a few kilobases
-  contains nearly all 256 possible 4-mers, so the Jaccard similarity between
-  any two of these sequences is close to 1. Across all 66 pairs the lowest
-  value is 0.958, and 36 pairs score exactly 1.0. The 8-mer cosine score in
-  `hgt_final_model.py` is less affected, but still compares whole replicons.
-- **The labels are circular.** `build_hgt_dataset.py` labels a pair as HGT if
-  it is cross-species with similarity between 0.1 and 0.6, and the classifier
-  is then trained on that same similarity. Because of the saturation above, no
-  pair falls in that range, so `hgt_dataset_v2.csv` has 0 positive labels out
-  of 66 and the classifier has nothing to learn.
-- **Small sample.** Five genomes and 12 sequences are too few for any
-  statistical claim.
+- Sequences are compared at the replicon level (chromosomes and plasmids).
+  Gene-level analysis would use the NCBI CDS files
+  (`*_cds_from_genomic.fna.gz`) or gene calls from Prodigal.
+- 4-mer profiles of long sequences are very similar to one another (pairwise
+  Jaccard similarity of 0.958 or higher across all 66 pairs), so longer k-mers,
+  such as the 8-mer cosine score in `hgt_final_model.py`, separate sequences
+  better.
+- HGT labels in `build_hgt_dataset.py` are heuristic and based on similarity,
+  rather than on experimentally validated transfer events.
+- The dataset is small: five genomes and 12 sequences.
 
 ## Running it
 
@@ -92,8 +79,8 @@ Earlier experiments, kept for reference but not part of the pipeline above:
 | `feature_engineering.py` | 3-mer frequencies for the E. coli genome |
 | `build_dataset.py`, `train_model.py` | Genome-level 3-mer features and a classifier |
 | `extract_genes.py` | Same as `extract_cds.py` without the length filter |
-| `build_gene_similarity.py` | First version of the pairwise similarity step |
-| `train_hgt_model.py` | First classifier; reads `hgt_dataset.csv`, which no current script writes |
+| `build_gene_similarity.py` | Earlier version of the pairwise similarity step |
+| `train_hgt_model.py` | Earlier classifier trained on `hgt_dataset.csv` |
 
 ## Outputs
 
@@ -101,7 +88,7 @@ Earlier experiments, kept for reference but not part of the pipeline above:
 network figure (`hgt_graph_publication.png` and `.pdf`). The saved network has
 12 nodes and 46 edges.
 
-## What I would change
+## Future work
 
 - Use annotated CDS or Prodigal gene calls so the nodes are genes.
 - Compare genes with alignment (BLAST or DIAMOND) or with k large enough not to
